@@ -10,7 +10,7 @@ Param(
     
     [Parameter()]
     [String]
-    $Hostname
+    $CertificateDnsName
 )
 
 end {
@@ -21,7 +21,7 @@ end {
     #Define a role for our server
     $role = Get-LabPostInstallationActivity -CustomRole QuickStartEnvironment -Properties @{
         CertPass = 'poshacme'
-        CertificateDnsName = $hostname
+        CertificateDnsName = $CertificateDnsName
         DatabaseCredential = $DatabaseCredential
     }
 

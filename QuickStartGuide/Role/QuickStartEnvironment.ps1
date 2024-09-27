@@ -1,7 +1,7 @@
 Param(
     [Parameter()]
     [String]
-    $CertPass = 'poshacme',
+    $CertPass,
 
     [Parameter()]
     [String]
