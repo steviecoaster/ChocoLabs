@@ -28,9 +28,10 @@ $license = Join-Path $PSscriptRoot -ChildPath 'chocolatey.license.xml'
 $certData = Get-PfxCertificate -FilePath $cert -Password ($CertPass | ConvertTo-SecureString -AsPlainText -Force)
 #Import the certificate to the VM
 Import-PfxCertificate -FilePath $cert -CertStoreLocation Cert:\LocalMachine\My -Exportable -Password ($CertPass | ConvertTo-SecureString -AsPlainText -Force)
+Import-PfxCertificate -FilePath $cert -CertStoreLocation Cert:\LocalMachine\TrustedPeople -Exportable -Password ($CertPass | ConvertTo-SecureString -AsPlainText -Force)
 
 #Peel Thumbprint off the cert
-$thumbprint = $certData.Thumbprint
+$thumbprint = (Get-ChildItem Cert:\LocalMachine\my).Thumbprint
 
 #Add an entry to the hosts file so we don't have to rely on working DNS for setup
 New-HostsFileEntry -IpAddress '127.0.0.1' -Hostname $Hostname

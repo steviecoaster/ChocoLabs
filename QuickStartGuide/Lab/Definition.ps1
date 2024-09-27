@@ -21,7 +21,7 @@ end {
     #Define a role for our server
     $role = Get-LabPostInstallationActivity -CustomRole QuickStartEnvironment -Properties @{
         CertPass = 'poshacme'
-        CertificateDnsName = 'chocoserver.steviecoaster.dev'
+        CertificateDnsName = $hostname
         DatabaseCredential = $DatabaseCredential
         Hostname = $Hostname
     }
