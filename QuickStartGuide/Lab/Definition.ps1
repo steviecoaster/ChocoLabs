@@ -23,7 +23,6 @@ end {
         CertPass = 'poshacme'
         CertificateDnsName = $hostname
         DatabaseCredential = $DatabaseCredential
-        Hostname = $Hostname
     }
 
     #Configure the network for our server
