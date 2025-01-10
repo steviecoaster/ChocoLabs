@@ -9,7 +9,11 @@ Param(
 
     [Parameter()]
     [pscredential]
-    $DatabaseCredential
+    $DatabaseCredential,
+
+    [Parameter()]
+    [String]
+    $TestBranch
 )
 
 $helpers = Join-Path $PSScriptRoot -ChildPath 'helpers.ps1'
@@ -41,6 +45,10 @@ $params = @{
     LicenseFile = $license
 }
 
+if($TestBranch){
+    $env:CHOCO_QSG_BRANCH = $TestBranch
+}
+
 $script = Invoke-RestMethod https://ch0.co/qsg-go
 & ([scriptblock]::Create($script)) @params
 
@@ -49,5 +57,5 @@ $SkipBrowserLaunch = $true #Hack to keep web browsers opening up on us in the la
 .\Start-C4bNexusSetup.ps1
 .\Start-C4bCcmSetup.ps1 -DatabaseCredential $DatabaseCredential
 .\Start-C4bJenkinsSetup.ps1
-.\Set-SslSecurity.ps1 -Thumbprint $thumbprint -CertificateDnsName $CertificateDnsName -Hardened
+.\Set-SslSecurity.ps1 -Thumbprint $thumbprint -CertificateDnsName $CertificateDnsName
 Pop-Location
