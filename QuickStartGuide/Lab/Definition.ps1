@@ -1,6 +1,10 @@
 [CmdletBinding()]
 Param(
     [Parameter()]
+    [String]
+    $Name,
+
+    [Parameter()]
     [PSCredential]
     $Credential = (Get-Credential -Message 'Provide a password for the local admin user to be created' -UserName sweettooth),
 
@@ -20,7 +24,7 @@ Param(
 end {
 
     #Define our Lab definition
-    New-LabDefinition -Name QuickStartEnvironmentLab -DefaultVirtualizationEngine HyperV
+    New-LabDefinition -Name $Name -DefaultVirtualizationEngine HyperV
     
     #Define base properties to pass to the custom role for installation
     $properties = @{
