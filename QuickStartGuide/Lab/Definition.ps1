@@ -18,29 +18,53 @@ Param(
 
     [Parameter()]
     [String]
-    $TestBranch
+    $TestBranch,
+
+    [Parameter(ParameterSetName = 'QSG')]
+    [ValidateSet('Small', 'Medium', 'Large')]
+    $ChocolateyServerVMSize = 'Large',
+
+    [Parameter(ParameterSetName = 'QSG')]
+    [ValidateSet('Small', 'Medium', 'Large')]
+    $ClientVMSize = 'Small'
 )
 
 end {
+
+    # Define the various resource allocations for VM Size
+    $resources = @{
+        Large  = @{
+            Memory     = 16GB
+            Processors = 4
+        }
+        Medium = @{
+            Memory     = 8GB
+            Processors = 4
+        }
+        Small  = @{
+            Memory     = 2GB
+            Processors = 2
+        }
+    }
 
     #Define our Lab definition
     New-LabDefinition -Name $Name -DefaultVirtualizationEngine HyperV
     
     #Define base properties to pass to the custom role for installation
     $properties = @{
-        CertPass = 'poshacme'
+        CertPass           = 'poshacme'
         CertificateDnsName = $CertificateDnsName
         DatabaseCredential = $DatabaseCredential
     }
 
     #If testing a PR, supply the PR Id number. Environment will be built from PR branch
-    if($TestBranch){
-        $properties.Add('TestBranch',$TestBranch)
+    if ($TestBranch) {
+        $properties.Add('TestBranch', $TestBranch)
     }
 
     #Define a role for our server
     $role = Get-LabPostInstallationActivity -CustomRole QuickStartEnvironment -Properties $properties
-    $clientRole = Get-LabPostInstallationActivity -CustomRole QuickStartClient -Properties @{Fqdn = $CertificateDnsName}
+    $clientRole = Get-LabPostInstallationActivity -CustomRole QuickStartClient -Properties @{Fqdn = $CertificateDnsName }
 
    
 
@@ -53,11 +77,11 @@ end {
     
     #Define the server itself in the Lab
     $cofiguration = @{
-        Name            = 'ChocoServer'
-        OperatingSystem = 'Windows Server 2022 Datacenter Evaluation (Desktop Experience)'
-        Memory          = 16GB
-        Processors      = 4
-        NetworkAdapter         = $nic1
+        Name                     = 'ChocoServer'
+        OperatingSystem          = 'Windows Server 2022 Datacenter Evaluation (Desktop Experience)'
+        Memory                   = $resources[$ChocolateyServerVMSize]['Memory']
+        Processors               = $resources[$ChocolateyServerVMSize]['Processors']
+        NetworkAdapter           = $nic1
         PostInstallationActivity = $Role
     }
 
@@ -65,11 +89,11 @@ end {
 
     #Define the server itself in the Lab
     $cofiguration = @{
-        Name            = 'ClientMachine'
-        OperatingSystem = 'Windows Server 2022 Datacenter Evaluation (Desktop Experience)'
-        Memory          = 8GB
-        Processors      =  2
-        NetworkAdapter         = $nic2
+        Name                     = 'ClientMachine'
+        OperatingSystem          = 'Windows Server 2022 Datacenter Evaluation (Desktop Experience)'
+        Memory                   = $resources[$ClientVMSize]['Memory']
+        Processors               = $resources[$ClientVMSize]['Processors']
+        NetworkAdapter           = $nic2
         PostInstallationActivity = $clientRole
     }
 
