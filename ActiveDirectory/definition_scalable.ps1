@@ -1,5 +1,9 @@
 [CmdletBinding(DefaultParameterSetName = 'default')]
 Param(
+    [Parameter()]
+    [String]
+    $Name,
+
     [Parameter(ParameterSetName = 'QSG', Mandatory)]
     [Switch]
     $IncludeChocolateyServer,
@@ -22,6 +26,11 @@ Param(
 
     [Parameter(ParameterSetName = 'Default')]
     [Parameter(ParameterSetName = 'QSG')]
+    [String]
+    $DomainName = 'willywonka.dev',
+
+    [Parameter(ParameterSetName = 'Default')]
+    [Parameter(ParameterSetName = 'QSG')]
     [ValidateSet('Small','Medium','Large')]
     $DomainControllerVMSize = 'Small',
 
@@ -39,7 +48,7 @@ Param(
 end {
     New-LabDefinition -Name ActiveDirectory -DefaultVirtualizationEngine HyperV
 
-    Add-LabDomainDefinition -Name steviecoaster.dev -AdminUser Install -AdminPassword Somepass1
+    Add-LabDomainDefinition -Name $DomainName -AdminUser Install -AdminPassword Somepass1
     Set-LabInstallationCredential -Username Install -Password Somepass1
 
     # Define the various resource allocations for VM Size
@@ -65,7 +74,7 @@ end {
         Memory          = $resources[$DomainControllerVMSize]['Memory']
         Processors      = $resources[$DomainControllerVMSize]['Processors']
         Roles           = 'RootDC'
-        DomainName      = 'steviecoaster.dev'
+        DomainName      = $DomainName
     }
 
     Add-LabMachineDefinition @DC
@@ -76,7 +85,7 @@ end {
         Memory          = $resources[$ClientVMSize]['Memory']
         Processors      = $resources[$ClientVMSize]['Processors']
         OperatingSystem = 'Windows 10 Pro'
-        DomainName      = 'steviecoaster.dev'
+        DomainName      = $DomainName
     }
 
     Add-LabMachineDefinition @client
@@ -111,7 +120,7 @@ end {
                 Processors               = $resources[$ChocolateyServerVMSize]['Processors']
                 PostInstallationActivity = $Role
                 NetworkAdapter           = $nic1,$nic2
-                DomainName = 'steviecoaster.dev'
+                DomainName = $DomainName
             }
     
             Add-LabMachineDefinition @configuration
@@ -119,6 +128,4 @@ end {
     }
 
     Install-Lab
-    Show-LabDeploymentSummary -Detailed
-
 }
