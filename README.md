@@ -36,6 +36,6 @@ See the README file in each Lab folder for instructions on how to use the Lab. U
 
 **DISCLAIMER**
 
-The code provided in this repository is all stuff I use personally is not associate with Chocolatey Software, and cannot be associated with any Support contract(s) you may have when using labs which require a Chocolatey For Business license.
+The code provided in this repository is all stuff I use personally, is not associated with Chocolatey Software, and cannot be associated with any Support contract(s) you may have when using labs which require a Chocolatey For Business license.
 
 Your mileage may very. Use with caution.
