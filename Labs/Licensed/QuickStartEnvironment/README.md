@@ -4,7 +4,7 @@ This role will provision a VM according to the steps outlined at https://docs.ch
 
 ## Requirements
 
-This lab requires Requires [QuickStartGuide role](..\..\Roles\QuickStartGuide) be installed prior to using this lab
+This lab requires the [QuickStartGuide role](..\..\Roles\QuickStartGuide) be installed prior to using this lab
 
 **Prior to using this role** 
 You _will need_ to provide 2 pieces of information before building this Lab:
