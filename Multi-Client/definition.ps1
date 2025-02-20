@@ -31,12 +31,12 @@ Param(
 
     [Parameter(ParameterSetName = 'Default')]
     [Parameter(ParameterSetName = 'QSG')]
-    [ValidateSet('Small','Medium','Large')]
+    [ValidateSet('Small', 'Medium', 'Large')]
     $DomainControllerVMSize = 'Small',
 
     [Parameter(ParameterSetName = 'Default')]
     [Parameter(ParameterSetName = 'QSG')]
-    [ValidateSet('Small','Medium','Large')]
+    [ValidateSet('Small', 'Medium', 'Large')]
     $ClientVMSize = 'Small',
 
     [Parameter(ParameterSetName = 'Default')]
@@ -51,9 +51,59 @@ Param(
 
     [Parameter(ParameterSetName = 'Default')]
     [Parameter(ParameterSetName = 'QSG')]
-    [ValidateSet('Small','Medium','Large')]
+    [ValidateSet('Small', 'Medium', 'Large')]
     $ChocolateyServerVMSize = 'Large'
 )
+
+begin {
+    
+    function New-OptionSet {
+        [CmdletBinding()]
+        Param(
+            [Parameter(Mandatory)]
+            [String[]]
+            $Options
+        )
+        end {
+            $x = 1 
+            foreach ($o in $Options) {
+                '{0}. {1}' -f $x, $o
+                $x++
+            }
+        }
+    }
+
+    function New-ClientPC {
+        [CmdletBinding()]
+        Param(
+            [Parameter()]
+            [String]
+            $OperatingSystem,
+
+            [Parameter()]
+            [String]
+            $ResourceSize,
+
+            [Parameter()]
+            [Int]
+            $Count
+        )
+
+        end {
+            $client = @{
+                Name            = "ClientPC$($Count)"
+                Memory          = $resources[$ResourceSize]['Memory']
+                Processors      = $resources[$ResourceSize]['Processors']
+                OperatingSystem = $OperatingSystem
+                DomainName      = $DomainName
+            }
+            
+            Add-LabMachineDefinition @client
+        }
+    }
+
+    $AvailableOperatingSystems = (Get-LabAvailableOperatingSystem).OperatingSystemName
+}
 
 end {
     New-LabDefinition -Name ActiveDirectory -DefaultVirtualizationEngine HyperV
@@ -63,16 +113,16 @@ end {
 
     # Define the various resource allocations for VM Size
     $resources = @{
-        Large = @{
-            Memory = 16GB
+        Large  = @{
+            Memory     = 16GB
             Processors = 4
         }
         Medium = @{
-            Memory = 8GB
+            Memory     = 8GB
             Processors = 4
         }
-        Small = @{
-            Memory = 2GB
+        Small  = @{
+            Memory     = 2GB
             Processors = 2
         }
     }
@@ -90,15 +140,32 @@ end {
     Add-LabMachineDefinition @DC
 
     # Client PC
-    $client = @{
-        Name            = 'ClientPC01'
-        Memory          = $resources[$ClientVMSize]['Memory']
-        Processors      = $resources[$ClientVMSize]['Processors']
-        OperatingSystem = 'Windows 10 Pro'
-        DomainName      = $DomainName
+    for ($i = 1; $i -le $ClientMachineCount; $i++) {
+        Write-host "Creating client number $i" -ForegroundColor Blue
+        [int]$prompts = $AvailableOperatingSystems.Count
+        New-OptionSet -Options $AvailableOperatingSystems
+        $choice = Read-Host -Prompt "Select an available Operating System (1-$($AvailableOperatingSystems.Count))"
+ 
+        if (([int]$choice -gt $prompts) -or ([int]$choice -lt 1)) {
+            throw "Invalid option. Please choose between 1 and $prompts!"
+        }
+        else {
+            $OperatingSystem = $AvailableOperatingSystems[($choice - 1)]
+        }
+ 
+        New-OptionSet -Options @('Small - (2GB Ram, 2 vCPU)', 'Medium - (8GB Ram, 4 vCPU)', 'Large - (16GB Ram, 4 vCPU)')
+        $choice = Read-Host 'Select VM size (1-3)' 
+ 
+        $ClientVMSize = switch ($choice) {
+            1 { 'Small' }
+            2 { 'Medium' }
+            3 { 'Large' }
+            default { throw 'Invalid option. Please choose between 1 and 3!' }
+             
+        }
+ 
+        New-ClientPC -OperatingSystem $OperatingSystem -ResourceSize $ClientVMSize -Count $i
     }
-
-    Add-LabMachineDefinition @client
 
     # Add Chocolatey Server if requested
     switch ($PSCmdlet.ParameterSetName) {
@@ -129,8 +196,8 @@ end {
                 Memory                   = $resources[$ChocolateyServerVMSize]['Memory']
                 Processors               = $resources[$ChocolateyServerVMSize]['Processors']
                 PostInstallationActivity = $Role
-                NetworkAdapter           = $nic1,$nic2
-                DomainName = $DomainName
+                NetworkAdapter           = $nic1, $nic2
+                DomainName               = $DomainName
             }
     
             Add-LabMachineDefinition @configuration
