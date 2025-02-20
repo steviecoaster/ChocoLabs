@@ -106,7 +106,7 @@ begin {
 }
 
 end {
-    New-LabDefinition -Name ActiveDirectory -DefaultVirtualizationEngine HyperV
+    New-LabDefinition -Name $Name -DefaultVirtualizationEngine HyperV
 
     Add-LabDomainDefinition -Name $DomainName -AdminUser Install -AdminPassword Somepass1
     Set-LabInstallationCredential -Username Install -Password Somepass1
