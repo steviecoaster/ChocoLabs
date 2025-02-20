@@ -1,5 +1,9 @@
 [CmdletBinding(DefaultParameterSetName = 'default')]
 Param(
+    [Parameter(ParameterSetName = 'default')]
+    [String]
+    $Name,
+
     [Parameter(ParameterSetName = 'QSG', Mandatory)]
     [Switch]
     $IncludeChocolateyServer,
@@ -22,7 +26,7 @@ Param(
 )
 
 end {
-    New-LabDefinition -Name ActiveDirectory -DefaultVirtualizationEngine HyperV
+    New-LabDefinition -Name $Name -DefaultVirtualizationEngine HyperV
 
     Add-LabDomainDefinition -Name steviecoaster.dev -AdminUser Install -AdminPassword Somepass1
     Set-LabInstallationCredential -Username Install -Password Somepass1
