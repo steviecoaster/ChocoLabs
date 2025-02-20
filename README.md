@@ -33,3 +33,9 @@ If you have a Chocolatey For Business license you can use the following labs:
 ## Usage
 
 See the README file in each Lab folder for instructions on how to use the Lab. Using [AutomatedLab.Utils](https://github.com/steviecoaster/AutomatedLab.Utils) is highly recommended.
+
+**DISCLAIMER**
+
+The code provided in this repository is all stuff I use personally is not associate with Chocolatey Software, and cannot be associated with any Support contract(s) you may have when using labs which require a Chocolatey For Business license.
+
+Your mileage may very. Use with caution.
