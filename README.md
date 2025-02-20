@@ -2,28 +2,34 @@
 
 This repository contains a collection of AutomatedLab definitions that I use at work.
 
-## Installing Automated Lab
+## Terminology
 
-You'll need AutomatedLab for this. Learn how to install it on their [docs site](https://automatedlab.org/en/latest/Wiki/Basic/install/).
+You'll encounter the following terms throughout this repository. This is what they mean:
 
-## Configuring a Custom role
+- `Lab`: The finished product of executing a definition
+- `Definition`: A PowerShell script that defines the "shape" of a Lab. Number of virtual machines, networking, any custom roles or extra "stuff" done while the machine is built up.
+- `Role`: Interchangeable with `Custom Role`, this is a folder created in the Lab Sources `CustomRoles` directory (_C:\LabSources\CustomRoles by default_). This folder _must_ contain a `.ps1` script of the same name e.g. an `Inedo` folder must contain `Inedo.ps1`.
+- `C4b`: This is Chocolatey For Business
+- `Lab Configuration/Configuration`: A file stored on disk as the result of running `New-LabConfiguration`. Used when working with AutomatedLab via the [AutomatedLab.Utils](https://github.com/steviecoaster/AutomatedLab.Utils) PowerShell module.
 
-Custom roles are created by creating a folder in `C:\LabSources\CustomRoles`, or wherever you have configured your `LabSources` directory
-Once you've created your folder, place a ps1 file of the _same name_ inside the folder.
+## Available Labs
 
-E.g. to create a Custom Role called `MyCustomRole`, you'd do something like this:
+### Open Source Labs
 
-```powershell
-$null = New-Item C:\LabSources\CustomRoles\MyCustomRole -ItemType Directory
-$null = New-Item C:\Lab\Sources\CustomRoles\MyCustomRole\MyCustomRole.ps1 -ItemType File
-```
+The following labs work without requiring a Chocolatey For Business license:
 
-You can place any additional PowerShell scripts, files, or folders inside the directory you created.
-It will be copied to the VM as part of the PostInstallationActivity, and the ps1 file you created will
-server as the entry point for interacting with the other files and folders.
+- [Inedo](.\Labs\Inedo\README.md): Provides an Inedo ProGet instance for testing and local development
+- [Chocolatey](.\Labs\Chocolatey\README.md): Provides a Chocolatey environment for testing and package authoring.
+- [Active Directory](.\Labs\ActiveDirectory\README.md): Provides an Windows Server 2022 Active Directory Environment. (_May require Chocolatey For Business license in some scenarios. See Lab README for details._)
 
-For example, the QuickStartGuide Role that I created has my chocolatey license and pfx file contained in my LabSources folder.
 
-## Creating a Lab Definition
+### Licensed Labs
 
-You'll find a sample lab definition which implements my QuickStartGuide role in the Lab folder called `Definition.ps1`.
+If you have a Chocolatey For Business license you can use the following labs:
+
+- [QuickstartGuide](.\Labs\Licensed\QuickStartEnvironment\README.md): Builds a Lab based on [Chocolatey's Quickstart Guide](https://docs.chocolatey.org/en-us/c4b-environments/quick-start-environment/chocolatey-for-business-quick-start-guide/)
+- [Multi-Client](.\Labs\Licensed\Multi-Client\README.md): Builds a Domain Controller, and members based on `$ClientMachineCount`. Optionally include a Chocolatey server.
+
+## Usage
+
+See the README file in each Lab folder for instructions on how to use the Lab. Using [AutomatedLab.Utils](https://github.com/steviecoaster/AutomatedLab.Utils) is highly recommended.
