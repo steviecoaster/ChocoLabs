@@ -1,20 +1,18 @@
-[CmdletBinding(DefaultParameterSetName = 'default')]
+[CmdletBinding()]
 Param(
-    [Parameter(Mandatory, ParameterSetName = 'default')]
-    [Parameter(Mandatory, ParameterSetName = 'Author')]
+    [Parameter(Mandatory)]
     [String]
     $Name,
 
-    [Parameter(Mandatory, ParameterSetName = 'default')]
-    [Parameter(Mandatory, ParameterSetName = 'Author')]
+    [Parameter()]
     [PSCredential]
     $ServerLogin,
 
-    [Parameter(ParameterSetName = 'default')]
+    [Parameter()]
     [String]
     $VMName = 'SweetTooth',
 
-    [Parameter(ParameterSetName = 'default')]   
+    [Parameter()]   
     [String]
     [ArgumentCompleter({
             [OutputType([System.Management.Automation.CompletionResult])]
@@ -40,13 +38,11 @@ Param(
         })]
     $OperatingSystem = 'Windows Server 2022 Datacenter Evaluation (Desktop Experience)',
 
-    [Parameter(ParameterSetName = 'default')]
-    [Parameter(ParameterSetName = 'Author')]
+    [Parameter()]
     [Switch]
     $IncludeAuthoringTools,
 
-    [Parameter(ParameterSetName = 'default')]
-    [Parameter(ParameterSetName = 'Author')]
+    [Parameter()]
     [String]
     $AdditionalPackages
 )
@@ -80,36 +76,36 @@ Invoke-LabCommand -ComputerName $configuration['Name'] -ScriptBlock {
 } -ActivityName 'Install Chocolatey'
 
 #If auth
-switch ($PSCmdlet.ParameterSetName) {
-    'Author' {
+if ($IncludeAuthoringTools) {
+    
+    $AuthorPack = @('vscode.install'   
+        'git.install'
+        'vscode-powershell'
+        'chocolatey-vscode'
+        'notepadplusplus.install'
+        'beyondcompare'
+    )
 
-        $AuthorPack = @('vscode.install'   
-            'git.install'
-            'vscode-powershell'
-            'chocolatey-vscode'
-            'notepadplusplus.install'
-            'beyondcompare'
-        )
+    if ($AdditionalPackages) {
+        $AuthorPack += $AdditionalPackages
+    }
 
-        if ($AdditionalPackages) {
-            $AuthorPack += $AdditionalPackages
+    Invoke-LabCommand -ActivityName 'Install Authoring Tools' -Variable (Get-Variable AuthorPack) -ComputerName $configuration['Name'] -ScriptBlock {
+        try {
+            choco install $($AuthorPack -join ';') -y --source = 'https://community.chocolatey.org/api/v2'
         }
-
-        Invoke-LabCommand -ActivityName 'Install Authoring Tools' -Variable (Get-Variable AuthorPack) -ComputerName $configuration['Name'] -ScriptBlock {
-            try {
-                choco install $($AuthorPack -join ';') -y --source = 'https://community.chocolatey.org/api/v2'
-            }
-            catch {
-                choco install $($AuthorPack -join ';') -y --source = 'https://community.chocolatey.org/api/v2'
-            }
-            finally {
-                $choco = 'C:\ProgramData\chocolatey\bin\choco.exe'
-                $chocoArgs = @('install', ($AuthorPack -join ';'), '-y', "==source='https://community.chocolatey.org/api/v2'")
-                & $choco @chocoArgs
-            }
+        catch {
+            choco install $($AuthorPack -join ';') -y --source = 'https://community.chocolatey.org/api/v2'
+        }
+        finally {
+            $choco = 'C:\ProgramData\chocolatey\bin\choco.exe'
+            $chocoArgs = @('install', ($AuthorPack -join ';'), '-y', "==source='https://community.chocolatey.org/api/v2'")
+            & $choco @chocoArgs
         }
     }
+    
 }
+
 Write-ScreenInfo -Message 'Restarting VM to refresh PATH/registry/env' -TaskStart
 Restart-LabVM -ComputerName $configuration['Name']
 Write-ScreenInfo -Message 'VM is now ready for use. Have fun!' -TaskEnd
