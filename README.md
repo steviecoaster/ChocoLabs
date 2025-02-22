@@ -2,6 +2,12 @@
 
 This repository contains a collection of AutomatedLab definitions that I use at work.
 
+## Required Software
+
+To use these labs you need to have a Windows host with [AutomatedLab](https://automatedlab.org) installed, and Hyper-V enabled
+
+Lab hardware requirements available in the respective READMEs.
+
 ## Terminology
 
 You'll encounter the following terms throughout this repository. This is what they mean:

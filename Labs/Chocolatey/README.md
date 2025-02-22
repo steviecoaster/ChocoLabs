@@ -12,6 +12,16 @@ If including Authoring tools, this VM will have the following packages installed
 - notepadplusplus.install
 - beyondcompare
 
+## Lab Requirements
+
+### Hardware
+
+This lab requires 4GB Ram and 4 vCPUs (Edit lines 63-64 in lab's definition.ps1 to change. Lower is not recommended)
+
+### Operating System
+
+By default the lab will use 'Windows Server 2022 Datacenter Evaluation (Desktop Experience)', but can be changed with parameters (see next section).
+
 ## Customization
 
 You can customize the environment in the following ways:
