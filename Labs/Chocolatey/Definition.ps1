@@ -1,8 +1,8 @@
 [CmdletBinding()]
 Param(
-    [Parameter(Mandatory)]
+    [Parameter()]
     [String]
-    $Name,
+    $Name = 'Chocolatey',
 
     [Parameter()]
     [PSCredential]
@@ -56,6 +56,8 @@ $nic1 = New-LabNetworkAdapterDefinition -VirtualSwitch 'Default Switch' -UseDhcp
 #Set the Lab VM credential
 Set-LabInstallationCredential -Username $ServerLogin.Username -Password $ServerLogin.GetNetworkCredential().Password
 
+#Configure Disk: C Drive
+Add-LabDiskDefinition -Name OS -DriveLetter C -DiskSizeInGb 100 -Label Windows
 #Define the server itself in the Lab
 $configuration = @{
     Name            = $VMName
@@ -63,6 +65,7 @@ $configuration = @{
     Memory          = 4GB
     Processors      = 4
     NetworkAdapter  = $nic1
+    Disk            = 'OS'
 }
 
 Add-LabMachineDefinition @configuration
